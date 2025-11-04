@@ -1,6 +1,6 @@
 package sk.uniba.fmph.dcs.terra_futura;
 
-import java.util.List;
+import java.util.*;
 
 public interface Effect {
     boolean check(List<Resource> input, List<Resource> output, int pollution);
