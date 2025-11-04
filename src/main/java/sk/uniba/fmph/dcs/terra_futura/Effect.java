@@ -1,7 +1,9 @@
 package sk.uniba.fmph.dcs.terra_futura;
 
+import java.util.*;
+
 public interface Effect {
-    public static void main(String[] args) {
-        System.out.println("Hello Wosd");
-    }
+    boolean check(List<Resource> input, List<Resource> output, int pollution);
+    boolean hasAssistance();
+    String state();
 }
