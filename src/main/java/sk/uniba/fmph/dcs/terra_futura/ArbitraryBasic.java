@@ -20,11 +20,13 @@ public class ArbitraryBasic implements Effect {
 
     @Override
     public boolean hasAssistance(){
-        return true;
+        return false;
     }
 
     @Override
     public String state() {
         return "ArbitraryBasic [from=" + from + ", to=" + to + ", pollution=" + pollution + "]";
     }
+
+
 }
