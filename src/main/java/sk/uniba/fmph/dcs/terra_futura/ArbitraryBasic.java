@@ -20,7 +20,7 @@ public class ArbitraryBasic implements Effect {
 
     @Override
     public boolean hasAssistance(){
-        return false;
+        return true;
     }
 
     @Override
