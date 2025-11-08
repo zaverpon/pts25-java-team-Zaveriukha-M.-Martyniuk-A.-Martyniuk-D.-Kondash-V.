@@ -9,18 +9,6 @@ import java.util.List;
 
 // Minimal(temporary) version for compile tests
 
-class Card {
-    private final Effect effect;
-
-    Card(Effect effect) { this.effect = effect; }
-
-    boolean activate(List<Resource> input, List<Resource> output, int pollution) {
-        return false;
-    }
-
-    String state() { return null; }
-}
-
 class Grid {
     private Card card;
 
