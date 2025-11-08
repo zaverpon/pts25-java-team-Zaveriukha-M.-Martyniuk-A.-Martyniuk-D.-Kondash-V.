@@ -35,7 +35,9 @@ public class Grid {
     }
 
     public void putCard(GridPosition coordinate, Card card) {
-        cards.put(coordinate, card);
+        if (canPutCard(coordinate)) {
+            cards.put(coordinate, card);
+        }
     }
 
     public boolean canBeActivated(GridPosition coordinate) {
