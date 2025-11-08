@@ -2,19 +2,20 @@ package sk.uniba.fmph.dcs.terra_futura;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 import java.util.List;
+import java.util.ArrayList;
+
+import static org.junit.Assert.*;
 
 /**
- * Unit tests for Card class.
- * Verifies delegation of logic to Effect and basic card behavior.
+ * Unit tests for the Card class.
  */
 public class CardTest {
 
+    private Card card;
     private Effect fakeEffectTrue;
     private Effect fakeEffectFalse;
-    private Card cardTrue;
-    private Card cardFalse;
 
     @Before
     public void setUp() {
@@ -23,13 +24,15 @@ public class CardTest {
             public boolean check(List<Resource> input, List<Resource> output, int pollution) {
                 return true;
             }
+
             @Override
             public boolean hasAssistance() {
                 return false;
             }
+
             @Override
             public String state() {
-                return "FakeEffectTrue";
+                return "FakeTrue";
             }
         };
 
@@ -38,46 +41,92 @@ public class CardTest {
             public boolean check(List<Resource> input, List<Resource> output, int pollution) {
                 return false;
             }
+
             @Override
             public boolean hasAssistance() {
                 return true;
             }
+
             @Override
             public String state() {
-                return "FakeEffectFalse";
+                return "FakeFalse";
             }
         };
 
-        cardTrue = new Card(fakeEffectTrue);
-        cardFalse = new Card(fakeEffectFalse);
+        card = new Card(new Resource[]{Resource.Green, Resource.Red}, 0, fakeEffectTrue, fakeEffectFalse);
     }
 
     @Test
-    public void testActivateDelegatesToEffect() {
-        boolean result = cardTrue.activate(List.of(Resource.Green), List.of(Resource.Gear), 1);
-        System.out.println("Card.activate() result = " + result);
-        assertTrue(result);
+    public void testCanGetResourcesTrue() {
+        List<Resource> incoming = List.of(Resource.Green, Resource.Gear);
+        assertTrue(card.canGetResources(incoming));
+    }
 
-        result = cardFalse.activate(List.of(Resource.Green), List.of(Resource.Gear), 1);
-        System.out.println("Card.activate() result = " + result);
+    @Test
+    public void testCanGetResourcesFalseForPollution() {
+        List<Resource> incoming = List.of(Resource.Green, Resource.Polution);
+        assertFalse(card.canGetResources(incoming));
+    }
+
+    @Test
+    public void testGetResourcesAddsWhenAllowed() {
+        List<Resource> newRes = new ArrayList<>();
+        newRes.add(Resource.Yellow);
+        card.getResources(newRes);
+
+        assertTrue(card.getResources().contains(Resource.Yellow));
+    }
+
+    @Test
+    public void testCanPutResourcesTrue() {
+        List<Resource> outgoing = List.of(Resource.Green);
+        assertTrue(card.canPutResources(outgoing));
+    }
+
+    @Test
+    public void testCanPutResourcesFalse() {
+        List<Resource> outgoing = List.of(Resource.Money);
+        assertFalse(card.canPutResources(outgoing));
+    }
+
+    @Test
+    public void testPutResourcesRemovesWhenAllowed() {
+        List<Resource> outgoing = new ArrayList<>();
+        outgoing.add(Resource.Green);
+        card.putResources(outgoing);
+
+        assertFalse(card.getResources().contains(Resource.Green));
+    }
+
+    @Test
+    public void testCheckReturnsFalseWhenLowerFails() {
+        boolean result = card.check(List.of(Resource.Green), List.of(Resource.Car), 1);
         assertFalse(result);
     }
 
     @Test
-    public void testHasAssistanceDelegatesToEffect() {
-        assertFalse(cardTrue.hasAssistance());
-        assertTrue(cardFalse.hasAssistance());
+    public void testHasAssistanceTrueWhenAnyEffectHasAssistance() {
+        assertTrue(card.hasAssistance());
     }
 
     @Test
-    public void testStateReturnsEffectState() {
-        assertEquals("FakeEffectTrue", cardTrue.state());
-        assertEquals("FakeEffectFalse", cardFalse.state());
+    public void testStateNotEmptyAndContainsResources() {
+        String state = card.state();
+        System.out.println("Card state: " + state);
+        assertTrue(state.contains("Green"));
+        assertTrue(state.contains("pollutionSpaces"));
+        assertFalse(state.isEmpty());
     }
 
     @Test
-    public void testCardCreatedWithEffectNotNull() {
-        assertNotNull(cardTrue);
-        assertNotNull(cardFalse);
+    public void testCheckLowerOnly() {
+        assertFalse(card.checkLower(List.of(Resource.Red), List.of(Resource.Car), 0));
+    }
+
+    @Test
+    public void testEqualsAndHashCode() {
+        Card card2 = new Card(new Resource[]{Resource.Green, Resource.Red}, 0, fakeEffectTrue, fakeEffectFalse);
+        assertEquals(card, card2);
+        assertEquals(card.hashCode(), card2.hashCode());
     }
 }
