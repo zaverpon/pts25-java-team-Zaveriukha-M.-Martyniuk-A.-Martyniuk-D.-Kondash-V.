@@ -7,37 +7,6 @@ import static org.junit.Assert.*;
 import java.util.List;
 
 
-// Minimal(temporary) version for compile tests
-
-class Card {
-    private final Effect effect;
-
-    Card(Effect effect) { this.effect = effect; }
-
-    boolean activate(List<Resource> input, List<Resource> output, int pollution) {
-        return false;
-    }
-
-    String state() { return null; }
-}
-
-class Grid {
-    private Card card;
-
-    void putCard(GridPosition pos, Card c) { this.card = c; }
-
-    boolean canBeActivated(GridPosition pos) { return false; }
-
-    boolean activateCard(GridPosition pos, List<Resource> in, List<Resource> out, int pol) {
-        return false;
-    }
-}
-
-class GridPosition {
-    int x, y;
-    GridPosition(int x, int y) { this.x = x; this.y = y; }
-}
-
 
 /**
  * Integration test for the Effect interface and its implementations.
