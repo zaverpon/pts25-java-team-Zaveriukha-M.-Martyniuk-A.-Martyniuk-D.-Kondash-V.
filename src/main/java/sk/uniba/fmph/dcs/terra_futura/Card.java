@@ -60,7 +60,7 @@ public class Card {
     }
 
     public boolean hasAssistance() {
-        return (lowerEffect == null || lowerEffect.hasAssistance()) && (upperEffect == null || upperEffect.hasAssistance());
+        return (lowerEffect != null && lowerEffect.hasAssistance()) || (upperEffect != null && upperEffect.hasAssistance());
     }
 
     public String state() {

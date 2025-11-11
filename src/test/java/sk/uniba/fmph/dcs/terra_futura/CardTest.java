@@ -105,8 +105,8 @@ public class CardTest {
     }
 
     @Test
-    public void testHasAssistanceFalseWhenAnyEffectHasAssistance() {
-        assertFalse(card.hasAssistance());
+    public void testHasAssistanceTrueWhenAnyEffectHasAssistance() {
+        assertTrue(card.hasAssistance());
     }
 
     @Test
