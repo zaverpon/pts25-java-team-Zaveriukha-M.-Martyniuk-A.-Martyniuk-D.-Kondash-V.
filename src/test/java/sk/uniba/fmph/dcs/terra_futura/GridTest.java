@@ -26,12 +26,12 @@ public class GridTest {
 
     @Test
     public void testGetCardReturnsCard() {
-        assertEquals(cardCenter, grid.getCard(GridPosition.X0_Y0));
+        assertEquals(cardCenter, grid.getCard(GridPosition.X0_Y0).orElse(null)); // besause Optional<>
     }
 
     @Test
     public void testGetCardReturnsNullForEmpty() {
-        assertNull(grid.getCard(GridPosition.X1_Y1));
+        assertNull(grid.getCard(GridPosition.X1_Y1).orElse(null));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class GridTest {
     @Test
     public void testPutCardStoresCard() {
         grid.putCard(GridPosition.X1_Y0, cardNew);
-        assertEquals(cardNew, grid.getCard(GridPosition.X1_Y0));
+        assertEquals(cardNew, grid.getCard(GridPosition.X1_Y0).orElse(null)); // besause Optional<>
     }
 
     @Test
@@ -82,14 +82,14 @@ public class GridTest {
         grid.setActivationPattern(pattern);
         String state = grid.state();
         System.out.println("Grid state:\n" + state);
-        assertTrue(state.contains("(0,0)"));
-        assertTrue(state.contains("(1,0)"));
+        assertTrue(state.contains("(0, 0)"));
+        assertTrue(state.contains("(1, 0)"));
     }
 
     @Test
     public void testStateContainsCardInfo() {
         String state = grid.state();
         assertTrue(state.contains("Green"));
-        assertTrue(state.contains("(0,0)"));
+        assertTrue(state.contains("(0, 0)"));
     }
 }
