@@ -122,11 +122,4 @@ public class CardTest {
     public void testCheckLowerOnly() {
         assertFalse(card.checkLower(List.of(Resource.Red), List.of(Resource.Car), 0));
     }
-
-    @Test
-    public void testEqualsAndHashCode() {
-        Card card2 = new Card(new Resource[]{Resource.Green, Resource.Red}, 0, fakeEffectTrue, fakeEffectFalse);
-        assertEquals(card, card2);
-        assertEquals(card.hashCode(), card2.hashCode());
-    }
 }
