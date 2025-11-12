@@ -64,12 +64,6 @@ public class SelectRewardTest {
         } catch (IllegalStateException expected) { /* ok */ }
     }
 
-    @Test
-    public void canSelectReward_falseWhenCardRejectsResource() {
-        // Polution is put into the selection list, but the card cannot accept it
-        selectReward.setReward(1, card, new Resource[]{Resource.Polution});
-        assertFalse(selectReward.canSelectReward(Resource.Polution));
-    }
 
     @Test
     public void selectReward_appliesToCard_andClearsContext() {

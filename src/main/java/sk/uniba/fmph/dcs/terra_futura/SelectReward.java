@@ -9,16 +9,6 @@ import java.util.Optional;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/**
- * Which player can choose what rewards. Performs the action.
- * Structure (per design.pdf):
- *  - player: Optional[int]
- *  - selelction: List[Resource]
- *  - setReward(player: int,  card: Card, reward: Resource[])
- *  - canSelectReward(resource: Resource): bool
- *  - selectReward(resource: Resource)
- *  - state(): string
- */
 public final class SelectReward {
     private Optional<Integer> player;
     private List<Resource> selelction;
