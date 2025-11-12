@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
+
 import static org.junit.Assert.*;
 
 public class SelectRewardTest {
@@ -20,9 +21,6 @@ public class SelectRewardTest {
         card = new Card(new Resource[]{Resource.Green}, 0);
     }
 
-    /**
-     * Verifies that the initial state has no active selection.
-     */
     @Test
     public void initialState_isEmpty() {
         String state = selectReward.state();
