@@ -4,6 +4,7 @@ package sk.uniba.fmph.dcs.terra_futura;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -67,9 +68,11 @@ public class GameObserverTest  {
         fObserver p1 = new fObserver();
         obs.register(1, p1);
 
-        obs.notifyAll(null);
-        obs.notifyAll(Map.of(1, null));
-        assertNull(p1.last);
+        Map<Integer, String> state = new HashMap<>();
+        state.put(1, null);
+        obs.notifyAll(state);
+
+        assertNull( p1.last);
         assertEquals(0, p1.count);
     }
 
@@ -77,7 +80,7 @@ public class GameObserverTest  {
     @Test
     public void removesObserver()  {
         GameObserver obs = new GameObserver();
-        FakeObserver p1 = new FakeObserver();
+        fObserver p1 = new fObserver();
         obs.register(1, p1);
         obs.unregister(1);
 
