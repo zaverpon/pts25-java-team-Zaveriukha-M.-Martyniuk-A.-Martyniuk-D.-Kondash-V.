@@ -26,7 +26,7 @@ public class EfectIntegrationTest {
         Effect fixedEffect = new TransformationFixed(
                 List.of(Resource.Green),
                 List.of(Resource.Gear),
-                1);
+                0);
         cardFixed = new Card(new Resource[]{Resource.Green}, 0, fixedEffect, null);
 
         // OR effect: (Green→Car) OR (Red→Gear)
@@ -50,7 +50,7 @@ public class EfectIntegrationTest {
         boolean result = cardFixed.check(
                 List.of(Resource.Green),
                 List.of(Resource.Gear),
-                1);
+                0);
 
         assertTrue("Card with TransformationFixed should pass check()", result);
 
