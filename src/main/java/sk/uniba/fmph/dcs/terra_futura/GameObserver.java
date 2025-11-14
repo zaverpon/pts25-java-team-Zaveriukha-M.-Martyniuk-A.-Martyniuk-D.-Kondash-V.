@@ -1,32 +1,19 @@
 package sk.uniba.fmph.dcs.terra_futura;
 
 import java.util.Map;
-import java.util.HashMap;
 
 public class GameObserver  {
-    private final Map<Integer, TerraFuturaObserverInterface> obss = new HashMap<>();
+    private final Map<Integer, TerraFuturaObserverInterface> observers;
 
-    public void register (int PId, TerraFuturaObserverInterface obs )  {
-        if (obs == null) {
-            throw new IllegalArgumentException("observer is null");
-        }
-
-        obss.put(PId, obs);
-    }
-
-    public void unregister (int PId)  {
-        obss.remove(PId);
-    }
-
-    public int size ()  {
-        return obss.size();
+    public GameObserver(Map<Integer, TerraFuturaObserverInterface> observers)  {
+        this.observers = observers;
     }
 
     public void notifyAll(Map <Integer, String> gameState)  {
         if (gameState == null)  return;
 
         gameState.forEach((PId,message) ->  {
-            TerraFuturaObserverInterface obs = obss.get(PId);
+            TerraFuturaObserverInterface obs = observers.get(PId);
             if (message == null) {
                 return;
             }

@@ -1,6 +1,7 @@
 package sk.uniba.fmph.dcs.terra_futura;
 
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
@@ -8,86 +9,105 @@ import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
+/*unit tests for GameObserver*/
+
+class TestObserver implements TerraFuturaObserverInterface  {
+    int count;
+    String last;
+    @Override
+    public void notify(String gState)  {
+        last = gState;
+        count++;
+    }
+}
+
 
 public class GameObserverTest  {
-    static class fObserver implements TerraFuturaObserverInterface  {
-        String last;
-        int count;
-        @Override
-        public void notify(String gameState)  {
-            last = gameState;
-            count++;
-        }
+    private TestObserver pl1, pl2;
+    private GameObserver obs;
+    private HashMap<Integer, TerraFuturaObserverInterface> reg;
+
+
+    @Before
+    public void setUp()  {
+        reg = new HashMap<>();
+        pl1 = new TestObserver();
+        pl2 = new TestObserver();
+        obs = new GameObserver(reg);
     }
 
     /*Checks for the creation of duplicate players.*/
     @Test
     public void regAndReplace()  {
-        GameObserver obs = new GameObserver();
-        assertEquals(0, obs.size());
+        assertEquals(0, reg.size());
 
-        obs.register(1, new fObserver());
-        obs.register(2, new fObserver());
-        assertEquals(2, obs.size());
+        reg.put(1, pl1);
+        reg.put(2, pl2);
+        assertEquals(2, reg.size());
 
-        obs.register(2, new fObserver());
-        assertEquals(2, obs.size());
+        TestObserver new2 = new TestObserver();
+        reg.put(2, new2);
+        obs.notifyAll(Map.of(2, "x"));
+
+        assertEquals("x", new2.last);
+        assertNull(pl2.last);
     }
 
     /*checks for a null observer*/
     @Test
     public void regNull()  {
-        GameObserver obs = new GameObserver();
-        try {
-            obs.register(1, null);
-            fail("IllegalArgumentException expected");
-        }  catch (IllegalArgumentException expected)  {}
+        reg.put(1, null);
+        reg.put(2, pl2);
+
+        Map<Integer, String> message = new HashMap<>();
+        message.put(1, "x");
+        message.put(2, "y");
+        obs.notifyAll(message);
+
+        assertEquals("y", pl2.last);
+        assertEquals(1, pl2.count);
+
+
     }
 
     /*checks if it was sent to everyone*/
     @Test
     public void send()  {
-        GameObserver obs = new GameObserver();
-        fObserver p1 = new fObserver();
-        fObserver p2 = new fObserver();
-        obs.register(1, p1);
-        obs.register(2, p2);
+        reg.put(1, pl1);
+        reg.put(2, pl2);
 
-        obs.notifyAll(Map.of(1,"s1",2,"s2"));
+        obs.notifyAll(Map.of(1, "s1", 2, "s2"));
 
-        assertEquals("s1", p1.last);
-        assertEquals("s2", p2.last);
-        assertEquals(1, p1.count);
-        assertEquals(1, p2.count);
+        assertEquals("s1", pl1.last);
+        assertEquals("s2", pl2.last);
+        assertEquals(1, pl1.count);
+        assertEquals(1, pl2.count);
     }
 
     /*checks for a null message*/
     @Test
     public void nullMessage()  {
-        GameObserver obs = new GameObserver();
-        fObserver p1 = new fObserver();
-        obs.register(1, p1);
+        reg.put(1, pl1);
 
         Map<Integer, String> state = new HashMap<>();
         state.put(1, null);
         obs.notifyAll(state);
 
-        assertNull( p1.last);
-        assertEquals(0, p1.count);
+        assertNull(pl1.last);
+        assertEquals(0, pl1.count);
     }
 
     /*checks remove observers*/
     @Test
     public void removesObserver()  {
-        GameObserver obs = new GameObserver();
-        fObserver p1 = new fObserver();
-        obs.register(1, p1);
-        obs.unregister(1);
-
+        reg.put(1, pl1);
+        reg.remove(1);
         obs.notifyAll(Map.of(1, "x"));
-        assertNull(p1.last);
-        assertEquals(0, p1.count);
-        assertEquals(0, obs.size());
+
+        assertNull(pl1.last);
+        assertEquals(0, reg.size());
+        assertEquals(0, pl1.count);
+
     }
 
 }
