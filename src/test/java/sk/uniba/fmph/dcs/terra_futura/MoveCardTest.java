@@ -24,9 +24,9 @@ public class MoveCardTest  {
     @Test
     public void reffFromHidd()  {
         pile = new Pile(List.of(vis1, vis2), List.of(hid));
-        MoveCard mov = new MoveCard(pile, grid);
+        MoveCard mov = new MoveCard(1);
 
-        boolean t = mov.moveCard(1, GridPosition.X0_Y0);
+        boolean t = mov.moveCard(pile, GridPosition.X0_Y0, grid);
         assertTrue(t);
 
         assertTrue(grid.state().contains("(0, 0)"));
@@ -42,9 +42,9 @@ public class MoveCardTest  {
     @Test
     public void hiddEmpty()  {
         pile = new Pile(List.of(vis1, vis2));
-        MoveCard mov = new MoveCard(pile, grid);
+        MoveCard mov = new MoveCard(1);
 
-        boolean t = mov.moveCard(1, GridPosition.X0_Y0);
+        boolean t = mov.moveCard(pile, GridPosition.X0_Y0, grid);
         assertTrue(t);
 
 
@@ -56,9 +56,9 @@ public class MoveCardTest  {
     @Test
     public void badIndex()  {
         pile = new Pile(List.of(vis1, vis2));
-        MoveCard mov = new MoveCard(pile, grid);
+        MoveCard mov = new MoveCard(5);
 
-        boolean t = mov.moveCard(5, GridPosition.X0_Y0);
+        boolean t = mov.moveCard(pile, GridPosition.X0_Y0, grid);
         assertFalse(t);
 
         assertSame(vis1, pile.getCard(0).get());
