@@ -274,4 +274,49 @@ public class ProcessActionAssistanceTest {
                 assistanceCard, grid, OTHER_PLAYER_ID, otherPlayerCard,
                 emptyPairs, emptyPairs, null));
     }
+
+    @Test
+    public void activateCard_succeedsWhenAssistingCardHasNoLowerEffect_butCheckLowerAllows() {
+        Card assisting = new Card(new Resource[]{}, 0);
+
+        boolean ok = process.activateCard(
+                assistanceCard,
+                grid,
+                OTHER_PLAYER_ID,
+                assisting,
+                List.of(Pair.of(Resource.Green, GridPosition.X1_Y0)),
+                List.of(Pair.of(Resource.Gear, GridPosition.X0_Y1)),
+                List.of()
+        );
+
+        assertTrue("Activation should succeed when assisting card has no lowerEffect", ok);
+
+        assertTrue(outputCard.getResources().contains(Resource.Gear));
+
+        JSONObject json = new JSONObject(selectReward.state());
+        assertEquals(OTHER_PLAYER_ID, json.getInt("player"));
+    }
+
+    @Test
+    public void activateCard_failsIfOutputPositionDoesNotExist() {
+        boolean ok = process.activateCard(
+                assistanceCard,
+                grid,
+                OTHER_PLAYER_ID,
+                otherPlayerCard,
+                List.of(Pair.of(Resource.Green, GridPosition.X1_Y0)),
+                List.of(Pair.of(Resource.Gear, GridPosition.X2_Y2)),
+                List.of()
+        );
+
+        assertFalse("Activation should fail if output position is invalid", ok);
+
+        assertTrue(sourceCard.getResources().contains(Resource.Green));
+
+        assertFalse(outputCard.getResources().contains(Resource.Gear));
+
+        JSONObject json = new JSONObject(selectReward.state());
+        assertTrue(json.isNull("player"));
+        assertEquals(0, json.getJSONArray("selection").length());
+    }
 }

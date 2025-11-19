@@ -15,7 +15,7 @@ public final class ProcessActionAssistance {
     public boolean activateCard(
             final Card card,
             final Grid grid,
-            final int assisingPlayer,
+            final int assistingPlayer,
             final Card assisingCard,
             final List<Pair<Resource, GridPosition>> inputs,
             final List<Pair<Resource, GridPosition>> outputs,
@@ -77,7 +77,7 @@ public final class ProcessActionAssistance {
         // 3) Set up SelectReward for another player:
         //    The reward is a list of resource types that were paid (flatInputs)
         Resource[] paidResources = flatInputs.toArray(new Resource[0]);
-        selectReward.setReward(assisingPlayer, assisingCard, paidResources);
+        selectReward.setReward(assistingPlayer, assisingCard, paidResources);
 
         return true;
     }
@@ -88,8 +88,8 @@ public final class ProcessActionAssistance {
     ) {
         Map<GridPosition, List<Resource>> map = new HashMap<>();
         for (Pair<Resource, GridPosition> p : pairs) {
-            GridPosition pos = p.getRight(); // або getValue()
-            Resource res = p.getLeft();      // або getKey()
+            GridPosition pos = p.getRight(); // getValue()
+            Resource res = p.getLeft();      // getKey()
             List<Resource> list = map.get(pos);
             if (list == null) {
                 list = new ArrayList<>();
