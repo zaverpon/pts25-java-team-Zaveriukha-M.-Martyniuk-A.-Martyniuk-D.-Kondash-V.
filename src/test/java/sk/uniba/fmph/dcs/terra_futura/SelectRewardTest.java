@@ -1,45 +1,21 @@
 package sk.uniba.fmph.dcs.terra_futura;
 
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.*;
+import java.util.*;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyList;
 
 public class SelectRewardTest {
-
     private SelectReward selectReward;
-    private TestCard card;
-
-    private static class TestCard extends Card {
-
-        boolean canGetResult = true;
-        int canGetCalls = 0;
-        final List<List<Resource>> receivedResources = new ArrayList<>();
-
-        TestCard() {
-            super(new Resource[] {}, 0);
-        }
-
-        @Override
-        public boolean canGetResources(final List<Resource> newResources) {
-            canGetCalls++;
-            return canGetResult;
-        }
-
-        @Override
-        public void getResources(final List<Resource> newResources) {
-            receivedResources.add(new ArrayList<>(newResources));
-        }
-    }
+    private Card card;
 
     @Before
     public void setUp() {
         selectReward = new SelectReward();
-        card = new TestCard();
+        card = mock(Card.class);
     }
 
     @Test
@@ -56,7 +32,7 @@ public class SelectRewardTest {
 
     @Test
     public void setReward_initializesSelection_andCanSelect() {
-        card.canGetResult = true;
+        when(card.canGetResources(anyList())).thenReturn(true);
 
         selectReward.setReward(2, card, new Resource[] {Resource.Green, Resource.Red});
 
@@ -66,18 +42,13 @@ public class SelectRewardTest {
         assertFalse(selectReward.canSelectReward(Resource.Polution));
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void setReward_failsWhenAlreadyInProgress() {
-        card.canGetResult = true;
+        when(card.canGetResources(anyList())).thenReturn(true);
 
         selectReward.setReward(1, card, new Resource[] {Resource.Green});
 
-        try {
-            selectReward.setReward(2, card, new Resource[] {Resource.Red});
-            fail("Expected IllegalStateException when selection already in progress");
-        } catch (IllegalStateException expected) {
-            // ok
-        }
+        selectReward.setReward(2, card, new Resource[] {Resource.Red});
     }
 
     @Test
@@ -95,37 +66,38 @@ public class SelectRewardTest {
 
     @Test
     public void canSelectReward_falseWhenCardRejectsResource() {
-        card.canGetResult = false;
+        when(card.canGetResources(anyList())).thenReturn(false);
 
         selectReward.setReward(1, card, new Resource[] {Resource.Green});
 
-        assertFalse("Card rejects resource → cannot select",
+        assertFalse("Card rejects resource -> cannot select",
                 selectReward.canSelectReward(Resource.Green));
+        verify(card).canGetResources(anyList());
     }
 
     @Test
     public void selectReward_appliesToCard_andClearsContext() {
-        card.canGetResult = true;
+        when(card.canGetResources(anyList())).thenReturn(true);
 
-        selectReward.setReward(3, card, new Resource[] {Resource.Green, Resource.Red});
+        selectReward.setReward(3, card, new Resource[]{Resource.Green, Resource.Red});
 
         selectReward.selectReward(Resource.Green);
 
-        assertEquals(1, card.receivedResources.size());
-        List<Resource> firstCall = card.receivedResources.get(0);
-        assertEquals(1, firstCall.size());
-        assertEquals(Resource.Green, firstCall.get(0));
+        verify(card).getResources(
+                java.util.Collections.singletonList(Resource.Green)
+        );
 
         String state = selectReward.state();
         JSONObject json = new JSONObject(state);
         assertTrue(json.isNull("player"));
         assertEquals(0, json.getJSONArray("selection").length());
+
         assertFalse(selectReward.canSelectReward(Resource.Red));
     }
 
     @Test
     public void selectReward_rejectsNotAllowedResource() {
-        card.canGetResult = true;
+        when(card.canGetResources(anyList())).thenReturn(true);
 
         selectReward.setReward(1, card, new Resource[] {Resource.Green});
 
@@ -133,13 +105,13 @@ public class SelectRewardTest {
             selectReward.selectReward(Resource.Red);
             fail("Expected IllegalArgumentException for not allowed resource");
         } catch (IllegalArgumentException expected) {
-            assertTrue(card.receivedResources.isEmpty());
+            verify(card, never()).getResources(anyList());
         }
     }
 
     @Test
     public void selectReward_rejectsWhenCardCannotAccept() {
-        card.canGetResult = false;
+        when(card.canGetResources(anyList())).thenReturn(false);
 
         selectReward.setReward(1, card, new Resource[] {Resource.Green});
 
@@ -147,13 +119,13 @@ public class SelectRewardTest {
             selectReward.selectReward(Resource.Green);
             fail("Expected IllegalArgumentException when card cannot accept");
         } catch (IllegalArgumentException expected) {
-            assertTrue(card.receivedResources.isEmpty());
+            verify(card, never()).getResources(anyList());
         }
     }
 
     @Test
     public void state_serializesPlayerAndSelection() {
-        card.canGetResult = true;
+        when(card.canGetResources(anyList())).thenReturn(true);
 
         selectReward.setReward(7, card, new Resource[] {Resource.Green, Resource.Red});
 
@@ -167,28 +139,36 @@ public class SelectRewardTest {
     }
 
     @Test
-    public void selectReward_failsWhenWrongPlayerSelects() {
-        card.canGetResult = true;
-
-        selectReward.setReward(1, card, new Resource[] {Resource.Green});
-    }
-
-    @Test
     public void twoPlayersSelectRewards_sequentially() {
-        TestCard card1 = new TestCard();
-        TestCard card2 = new TestCard();
+        Card card1 = mock(Card.class);
+        Card card2 = mock(Card.class);
+
+        when(card1.canGetResources(anyList())).thenReturn(true);
+        when(card2.canGetResources(anyList())).thenReturn(true);
 
         selectReward.setReward(1, card1, new Resource[] {Resource.Green});
         selectReward.selectReward(Resource.Green);
+        verify(card1).getResources(
+                java.util.Collections.singletonList(Resource.Green)
+        );
 
         selectReward.setReward(2, card2, new Resource[] {Resource.Red});
         selectReward.selectReward(Resource.Red);
+        verify(card2).getResources(
+                java.util.Collections.singletonList(Resource.Red)
+        );
     }
 
     @Test
     public void setReward_emptyRewardArray() {
+        when(card.canGetResources(anyList())).thenReturn(true);
+
         selectReward.setReward(1, card, new Resource[] {});
 
         assertFalse(selectReward.canSelectReward(Resource.Green));
+
+        String state = selectReward.state();
+        JSONObject json = new JSONObject(state);
+        assertEquals(0, json.getJSONArray("selection").length());
     }
 }
