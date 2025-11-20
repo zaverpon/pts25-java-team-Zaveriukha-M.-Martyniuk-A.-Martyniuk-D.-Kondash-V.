@@ -1,22 +1,16 @@
 package sk.uniba.fmph.dcs.terra_futura;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
+import java.util.*;
+import org.json.*;
 
 public final class SelectReward {
     private Optional<Integer> player;
-    private List<Resource> selelction;
+    private List<Resource> selection;
     private Card targetCard;
 
     public SelectReward() {
         this.player = Optional.empty();
-        this.selelction = Collections.emptyList();
+        this.selection = Collections.emptyList();
         this.targetCard = null;
     }
 
@@ -26,7 +20,7 @@ public final class SelectReward {
      */
     public void setReward(final int player, final Card card, final Resource[] reward) {
         // robust check for "already in progress"
-        if (this.player.isPresent() || this.targetCard != null || !this.selelction.isEmpty()) {
+        if (this.player.isPresent() || this.targetCard != null || !this.selection.isEmpty()) {
             throw new IllegalStateException("Reward selection already in progress");
         }
         if (card == null) {
@@ -37,7 +31,7 @@ public final class SelectReward {
         }
         this.player = Optional.of(player);
         this.targetCard = card;
-        this.selelction = new ArrayList<>(Arrays.asList(reward));
+        this.selection = new ArrayList<>(Arrays.asList(reward));
     }
 
     /**
@@ -48,7 +42,7 @@ public final class SelectReward {
         if (resource == null || targetCard == null || player.isEmpty()) {
             return false;
         }
-        if (!this.selelction.contains(resource)) {
+        if (!this.selection.contains(resource)) {
             return false;
         }
         return targetCard.canGetResources(Collections.singletonList(resource));
@@ -64,7 +58,7 @@ public final class SelectReward {
         targetCard.getResources(Collections.singletonList(resource));
 
         this.player = Optional.empty();
-        this.selelction = Collections.emptyList();
+        this.selection = Collections.emptyList();
         this.targetCard = null;
     }
 
@@ -73,7 +67,7 @@ public final class SelectReward {
         obj.put("player", this.player.isPresent() ? this.player.get() : JSONObject.NULL);
 
         JSONArray arr = new JSONArray();
-        for (Resource r : this.selelction) {
+        for (Resource r : this.selection) {
             arr.put(r.name());
         }
         obj.put("selection", arr);
