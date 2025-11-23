@@ -2,10 +2,13 @@ package sk.uniba.fmph.dcs.terra_futura;
 
 import java.util.Map;
 
-public class GameObserver  {
+public final class GameObserver  {
     private final Map<Integer, TerraFuturaObserverInterface> observers;
 
-    public GameObserver(Map<Integer, TerraFuturaObserverInterface> observers)  {
+    public GameObserver(final Map<Integer, TerraFuturaObserverInterface> observers) {
+        if (observers == null) {
+            throw new IllegalArgumentException("observers must not be null");
+        }
         this.observers = observers;
     }
 
